@@ -63,7 +63,7 @@ def check_mail(mail=""):  # функция проверки на наличие 
                 file.write(f'Sender: {sender}\nTo: {mail}\nSubject: {subject}\nDate: {date}\nContent: {content}')
 
 
-def delete_mail(mail=""):  # функция удаления созданной почты. по умолчанию время жизни 1 час
+def delete_mail(mail=""):  # функция удаления созданной почты. по умолчанию время жизни 1  час
     url = "https://www.1secmail.com/mailbox"
 
     data = {
