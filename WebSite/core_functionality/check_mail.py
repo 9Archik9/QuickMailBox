@@ -1,21 +1,7 @@
 import requests
-import random
-import string
-import time
 import os
 
 API = "https://www.1secmail.com/api/v1/"  # сайт документации к используемой API: https://www.1secmail.com/api/#
-domain_list = ["1secmail.com", "1secmail.org", "1secmail.net"]
-domain = random.choice(domain_list)
-
-
-def generate_username():  # функция генерация случайного email
-    name = string.ascii_lowercase + string.digits  # используем для генерации рандомного имени словарь
-    # из латинских букв нижнего регистра + цифры
-    username = ''.join(random.choice(name) for _ in range(10))  # генерируем случайный username самого email на основе
-    # созданного выше имени
-
-    return username
 
 
 def check_mail(mail=""):  # функция проверки на наличие писем в ящике
@@ -61,38 +47,3 @@ def check_mail(mail=""):  # функция проверки на наличие 
 
             with open(mail_file_path, 'w') as file:  # запись данных в файл
                 file.write(f'Sender: {sender}\nTo: {mail}\nSubject: {subject}\nDate: {date}\nContent: {content}')
-
-
-def delete_mail(mail=""):  # функция удаления созданной почты. по умолчанию время жизни 1  час
-    url = "https://www.1secmail.com/mailbox"
-
-    data = {
-        'action': 'deleteMailbox',
-        'login': mail.split('@')[0],
-        'domain': mail.split('@')[1]
-    }  # payload с данными для удаления почты
-
-    r = requests.post(url, data=data)
-    print(f'[X] Почтовый адрес {mail} - удален!\n')  # информационный вывод
-
-
-def main():
-    try:
-        username = generate_username()
-        mail = f"{username}@{domain}"  # готовый случайный почтовый адрес из имени и домена
-        print(f"[+] Ваш почтовый адрес: {mail}")
-
-        mail_req = requests.get(f"{API}?login={mail.split('@')[0]}&domain={mail.split('@')[1]}")
-        # отправка запроса к API и логин
-
-        while True:
-            check_mail(mail=mail)
-            time.sleep(5)
-
-    except KeyboardInterrupt:
-        delete_mail(mail=mail)
-        print("Программа прервана!")
-
-
-if __name__ == '__main__':
-    main()

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Email Generator</title>
+</head>
+<body>
+    <h1>Email Generator</h1>
+    <p>Your email: {{ email }}</p>
+    <form method="post" action="{% url 'delete_email' %}">
+        {% csrf_token %}
+        <button type="submit">Delete Email</button>
+    </form>
+</body>
+</html>
