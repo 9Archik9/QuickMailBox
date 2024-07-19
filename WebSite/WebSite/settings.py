@@ -114,6 +114,10 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
@@ -123,9 +127,9 @@ CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 CELERY_BEAT_SCHEDULE = {
-    'delete-expired-emails-every-10-minutes': {
+    'delete-expired-emails-every-1-minute': {
         'task': 'main_page.tasks.delete_expired_emails',
-        'schedule': 600.0,
+        'schedule': 60.0,  # Выполнять каждую минуту
     },
 }
 
