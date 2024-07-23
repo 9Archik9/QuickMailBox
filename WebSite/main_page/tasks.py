@@ -1,7 +1,8 @@
 from celery import shared_task
 from django.utils import timezone
 from .models import UserEmail
-from core_functionality.main import delete_mail
+from core_functionality.delete_mail import delete_mail
+
 
 @shared_task
 def delete_expired_emails():
