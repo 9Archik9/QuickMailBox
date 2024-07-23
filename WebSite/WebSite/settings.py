@@ -29,7 +29,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'main_page',
-    'core_functionality'
+    'core_functionality',
+    'receive_message'
 ]
 
 MIDDLEWARE = [
@@ -112,11 +113,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
-
+# Статические файлы
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
+    BASE_DIR / 'static',  # Общая папка для статики
+    BASE_DIR / 'main_page/static',  # Статические файлы приложения main_page
+    BASE_DIR / 'receive_message/static',  # Статические файлы приложения receive_message
 ]
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Папка, куда соберутся все статики после collectstatic
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

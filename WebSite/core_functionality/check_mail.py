@@ -1,49 +1,73 @@
 import requests
 import os
+from main_page.models import UserEmail
+from receive_message.models import EmailMessage, Attachment
 
-API = "https://www.1secmail.com/api/v1/"  # сайт документации к используемой API: https://www.1secmail.com/api/#
+API = "https://www.1secmail.com/api/v1/"
 
 
-def check_mail(mail=""):  # функция проверки на наличие писем в ящике
+def fetch_messages(mail=""):
     req_link = f"{API}?action=getMessages&login={mail.split('@')[0]}&domain={mail.split('@')[1]}"
-    # кастомными параметрами (mail.split) достаем username и domain из переданной(сгенерированной) почты
-    r = requests.get(req_link).json()  # отправляем запрос по ссылке и забираем овтет в качестве json
-    length = len(r)  # количество элементов в массиве с возвращенными json данными
+    response = requests.get(req_link).json()
+    return response
+
+
+def read_message(mail, message_id):
+    read_msg = f"{API}?action=readMessage&login={mail.split('@')[0]}&domain={mail.split('@')[1]}&id={message_id}"
+    response = requests.get(read_msg).json()
+    return response
+
+
+def check_mail(mail=""):
+    messages = fetch_messages(mail)
+    length = len(messages)
 
     if length == 0:
         print("[INFO] Новых писем нет. Проверка происходит автоматически каждые 5 секунд")
-    else:  # если lenght не равно 0, ожидается, что мы получили какоето сообщение или сообщения
-        # данные приходят в виде списка со словарями с основными ключами:
-        # [id, from, subject, date, attachments, body, textBody, htmlBody]
+        return []
 
-        id_list = []  # список с id приходящих писем. в дальнейшем нужен для извлечения сообщения конкретного письма
+    print(f'[+] У вас {length} входящих сообщений! Почта обновляется автоматически каждые 5 секунд!')
 
-        for i in r:  # парсим ключи и значения пришедшего словаря
-            for k, v in i.items():
-                if k == "id":  # если есть ключ со значением id, забираем его значение и кладем в созданный список
-                    id_list.append(v)
+    current_dir = os.getcwd()
+    final_dir = os.path.join(current_dir, 'all_mails')
 
-        print(f'[+] У вас {length} входящих сообщений! Почта обновляется автоматически каждые 5 секунд!')
-        # какого значение lenght, такое и кол-во пришедших писем
+    if not os.path.exists(final_dir):
+        os.makedirs(final_dir)
 
-        current_dir = os.getcwd()  # получаем текущую директорию. в дальнейшем там будет хранить сообщения
-        final_dir = os.path.join(current_dir, 'all_mails')
+    email_messages = []
+    for message in messages:
+        message_id = message['id']
+        email_data = read_message(mail, message_id)
 
-        if not os.path.exists(final_dir):  # создаем текущую дирректорию, если она отсутсвтует
-            os.makedirs(final_dir)
+        sender = email_data.get('from')
+        subject = email_data.get('subject')
+        date = email_data.get('date')
+        content = email_data.get('textBody')
+        html_body = email_data.get('htmlBody', '')
 
-        for i in id_list:  # получение информации из писем. "i"  в данном случае id сообщения
-            read_msg = f"{API}?action=readMessage&login={mail.split('@')[0]}&domain={mail.split('@')[1]}&id={i}"
-            r = requests.get(read_msg).json()
+        # Проверяем, существует ли уже сообщение с таким api_id
+        if not EmailMessage.objects.filter(api_id=message_id).exists():
+            user_email = UserEmail.objects.get(email=mail)
+            EmailMessage.objects.create(
+                email=user_email,
+                api_id=message_id,
+                sender=sender,
+                subject=subject,
+                content=content,
+                html_body=html_body
+            )
 
-            sender = r.get('from')
-            subject = r.get('subject')
-            date = r.get('date')
-            content = r.get('textBody')
-            # описанные выше строки забирают данные по ключам: отправителя, тему, дату отправки и текст сообщения
+        email_messages.append({
+            'api_id': message_id,
+            'sender': sender,
+            'subject': subject,
+            'date': date,
+            'content': content
+        })
 
-            mail_file_path = os.path.join(final_dir, f'{i}.txt')  # сохранение вышеописанной информации в файл
-            # f'{i}.txt' используется для предотвращение перезаписи путем сохранения информации под id сообщения
+        mail_file_path = os.path.join(final_dir, f'{message_id}.txt')
+        with open(mail_file_path, 'w') as file:
+            file.write(f'Sender: {sender}\nTo: {mail}\nSubject: {subject}\nDate: {date}\nContent: {content}')
 
-            with open(mail_file_path, 'w') as file:  # запись данных в файл
-                file.write(f'Sender: {sender}\nTo: {mail}\nSubject: {subject}\nDate: {date}\nContent: {content}')
+    return email_messages
+

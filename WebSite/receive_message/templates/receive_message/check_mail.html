@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Check Mail</title>
+    {% load static %}
+    <script src="{% static 'receive_message/js/email.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'receive_message/css/styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Check Mail</h1>
+        <table id="email-table">
+            <thead>
+                <tr>
+                    <th>From</th>
+                    <th>Subject and Content</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody id="message-container">
+                <!-- Данные будут вставляться здесь -->
+            </tbody>
+        </table>
+        <div id="loading-icon" style="display: none;">
+            <img src="{% static 'images/loading.gif' %}" alt="Loading...">
+        </div>
+    </div>
+</body>
+</html>

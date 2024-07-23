@@ -1,7 +1,9 @@
 from django.views import View
 from django.shortcuts import render, redirect
-from core_functionality.main import setup, delete_mail
-from .models import UserEmail
+from core_functionality.main import setup
+from core_functionality.delete_mail import delete_mail
+from receive_message.models import EmailMessage
+from main_page.models import UserEmail
 
 
 class EmailView(View):
@@ -15,8 +17,14 @@ class EmailView(View):
             email_record.delete()
             email_record = None
 
-        # Передаем текущий email, если он есть
-        return render(request, self.template_name, {'email': email_record.email if email_record else None})
+        # Получаем все сообщения
+        messages = EmailMessage.objects.filter(email=email_record).order_by('-received_at') if email_record else []
+
+        # Передаем текущий email и сообщения на шаблон
+        return render(request, self.template_name, {
+            'email': email_record.email if email_record else None,
+            'messages': messages
+        })
 
     def post(self, request):
         lifespan = int(request.POST.get('lifespan', 2))  # Получаем выбранное время жизни

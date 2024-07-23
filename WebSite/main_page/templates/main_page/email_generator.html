@@ -3,29 +3,31 @@
 <head>
     <title>Email Generator</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'main_page/css/styles.css' %}">
+    <script src="{% static 'main_page/js/check_mail.js' %}"></script>
 </head>
 <body>
     <div class="container">
         <h1>Email Generator</h1>
         <form method="post">
             {% csrf_token %}
-            <label for="lifespan">Select lifespan:</label>
+            <label for="lifespan">Select Lifespan:</label>
             <select name="lifespan" id="lifespan">
-                <option value="2" selected>2 minutes</option>
+                <option value="2">2 minutes</option>
                 <option value="5">5 minutes</option>
                 <option value="10">10 minutes</option>
             </select>
             <button type="submit">Generate Email</button>
         </form>
         {% if email %}
-            <div class="email-container">
-                <p>Your email: {{ email }}</p>
-                <form method="post" action="{% url 'delete_email' %}">
-                    {% csrf_token %}
-                    <button type="submit">Delete Email</button>
-                </form>
-            </div>
+        <div id="email-field">Your email: {{ email }}</div>
+        <div id="delete-email">
+            <form method="post" action="{% url 'delete_email' %}">
+                {% csrf_token %}
+                <button type="submit">Delete Email</button>
+            </form>
+        </div>
+        <div id="message-container">Waiting for new emails...</div>
         {% endif %}
     </div>
 </body>

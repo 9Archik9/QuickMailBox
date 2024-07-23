@@ -58,21 +58,32 @@ form button:hover {
     background-color: #0056b3;
 }
 
-/* Email display */
-.email-container {
+/* Таблица сообщений */
+.message-panel {
     margin-top: 20px;
-    text-align: center;
 }
 
-.email-container p {
-    font-size: 18px;
-    color: #333;
+.email-table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-.email-container button {
-    background-color: #dc3545;
-    color: #fff;
+.email-table th, .email-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
 }
-.email-container button:hover {
-    background-color: #c82333;
+
+.email-table th {
+    background-color: #f2f2f2;
 }
+
+.email-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.email-table tr:hover {
+    background-color: #ddd;
+}
+
+
